@@ -1,0 +1,8 @@
+# ~/bash.bash_prompt
+
+PS1='[\u@\h \W]\$ '
+PS2='> '
+PS3=''
+PS4='+ '
+
+# vim: set ts=2 sw=2 et syn=sh:

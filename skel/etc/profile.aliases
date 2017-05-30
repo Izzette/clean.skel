@@ -1,0 +1,39 @@
+# etc/profile.aliases
+
+__command_in_path() {
+  command -v "$1" > /dev/null 2>&1
+
+  return $?
+}
+
+__mkalias() {
+  if __command_in_path "$1"; then
+    eval "alias $1='$1 $2'"
+  fi
+}
+
+__mkalias ls '-lhts --color=auto --sort=time --group-directories-first'
+__mkalias conky '--config="$XDG_CONFIG_HOME"/conky/conkyrc'
+__mkalias dict '-c "$XDG_CONFIG_HOME"/dict/dictrc'
+__mkalias abook '--config "$XDG_CONFIG_HOME"/abook/abookrc --datafile "$XDG_CACHE_HOME"/abook/addressbook'
+__mkalias emcc '--em-config "$XDG_CONFIG_HOME"/emscripten/config --em-cache "$XDG_CACHE_HOME"/emscripten/cache'
+__mkalias gdb '-nh -x "$XDG_CONFIG_HOME"/gdb/init'
+__mkalias gliv '--glivrc="$XDG_CONFIG_HOME"/gliv/glivrc'
+__mkalias gpg2 '--homedir "$XDG_CONFIG_HOME"/gnupg'
+__mkalias irssi '--config="$XDG_CONFIG_HOME"/irssi/config --home="$XDG_DATA_HOME"/irssi'
+__mkalias mbsync '-c "$XDG_CONFIG_HOME"/isync/mbsyncrc'
+__mkalias ltrace '-F "$XDG_CONFIG_HOME"/ltrace/ltrace.conf'
+__mkalias mocp '-M "$XDG_CONFIG_HOME"/moc'
+__mkalias mocp '-O MOCDir="$XDG_CONFIG_HOME"/moc'
+__mkalias pidgin '--config="$XDG_DATA_HOME"/purple'
+__mkalias svn '--config-dir "$XDG_CONFIG_HOME"/subversion'
+__mkalias tmux '-f "$XDG_CONFIG_HOME"/tmux/tmux.conf'
+__mkalias xrdb '-load "$XDG_CONFIG_HOME"/X11/xresources'
+__mkalias xsel '--logfile "$XDG_CACHE_HOME"/xsel/xsel.log'
+__mkalias petite '--eehistory "$XDG_DATA_HOME"/chezscheme/history'
+__mkalias nvidia-settings '--config="$XDG_CONFIG_HOME"/nvidia/settings'
+
+unset -f __command_in_path
+unset -f __mkalias
+
+# vim: set ts=2 sw=2 et syn=sh:

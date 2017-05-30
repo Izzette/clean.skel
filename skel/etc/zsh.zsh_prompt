@@ -1,0 +1,10 @@
+# etc/zsh.zsh_prompt
+
+autoload colors && colors
+
+PS1='%m%# '
+PS2='%_> '
+PS3='?: '
+PS4='+%N:%i> '
+
+# vim: set tgTs=2 sw=2 et syn=zsh:

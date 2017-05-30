@@ -1,0 +1,60 @@
+# etc/profile
+
+# Initialize imporant XDG base directory variables
+# If removing any of these XDG base directories (ending in _HOME)
+# make sure to comment out those that depend on them below (aliases).
+if [ -z "$XDG_CONFIG_HOME" ]; then
+  XDG_CONFIG_HOME="$HOME/.config"
+fi
+if [ -z "$XDG_DATA_HOME" ]; then
+  XDG_DATA_HOME="$HOME/.local"
+fi
+if [ -z "$XDG_CACHE_HOME" ]; then
+  XDG_CACHE_HOME="$HOME/.cache"
+fi
+
+export XDG_CONFIG_HOME
+export XDG_DATA_HOME
+export XDG_CACHE_HOME
+
+__mkdir_if_set() {
+  __dir="$1"
+
+  if [ -z "$__dir" ]; then
+    return
+  fi
+
+  mkdir -p "$__dir"
+  unset __dir
+}
+
+# Create important directories if missing
+__mkdir_if_set "$LOCAL_BIN"
+__mkdir_if_set "$XDG_CONFIG_HOME"
+__mkdir_if_set "$XDG_CACHE_HOME"
+__mkdir_if_set "$(dirname "$LESSHISTFILE")"
+
+unset -f __mkdir_if_set
+
+# Source dircolors
+if command -v dircolors > /dev/null 2>&1; then
+  __dir_colors="$(dircolors "$XDG_CONFIG_HOME"/dircolors)"
+
+  if [ -f "$__dir_colors" ] && \
+        [ -r "$__dir_colors" ]; then
+    . "$__dir_colors"
+  fi
+
+  unset -v __dir_colors
+fi
+
+# Aliases
+__profile_aliases="$XDG_CONFIG_HOME/profile.aliases"
+
+if [ -f "$__profile_aliases" ]; then
+  . "$__profile_aliases"
+fi
+
+unset -v __profile_aliases
+
+# vim: set ts=2 sw=2 et syn=sh:
