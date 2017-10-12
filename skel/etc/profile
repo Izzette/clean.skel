@@ -1,4 +1,27 @@
-# etc/profile
+# ~/etc/profile
+
+# Add local bin to path if not present
+if [ ! -z "$LOCAL_BIN" ]; then
+  __path_tail="$PATH:"
+  while true; do
+    __path_tail_orig="$__path_tail"
+    __path_tail="${__path_tail_orig#*:}"
+    __path_head="${__path_tail_orig%?$__path_tail}"
+    unset -v __path_tail_orig
+
+    if [ -z "$__path_head$__path_tail" ] ; then
+      if [ ! -z "$PATH" ]; then
+        PATH=":$PATH"
+      fi
+      PATH="$LOCAL_BIN$PATH"
+      break
+    elif [ "$LOCAL_BIN" = "$__path_head" ]; then
+      break
+    fi
+  done
+
+  unset -v __path_tail __path_head
+fi
 
 # Initialize imporant XDG base directory variables
 # If removing any of these XDG base directories (ending in _HOME)
@@ -12,10 +35,30 @@ fi
 if [ -z "$XDG_CACHE_HOME" ]; then
   XDG_CACHE_HOME="$HOME/.cache"
 fi
+if [ -z "$XDG_RUNTIME_DIR" ]; then
+  XDG_RUNTIME_DIR="$(mktemp -d)"
+  chmod 0700 "$XDG_RUNTIME_DIR"
+fi
 
-export XDG_CONFIG_HOME
-export XDG_DATA_HOME
-export XDG_CACHE_HOME
+export XDG_CONFIG_HOME XDG_DATA_HOME XDG_CACHE_HOME XDG_RUNTIME_DIR
+
+if [ -z "$HOSTNAME" ]; then
+  HOSTNAME="$(hostname)"
+fi
+if [ -z "$ICEAUTHORITY" ]; then
+  ICEAUTHORITY="$XDG_RUNTIME_DIR/Xiceauthority"
+fi
+if [ -z "$TMUX_TMPDIR" ]; then
+  TMUX_TMPDIR="$XDG_RUNTIME_DIR/tmux"
+fi
+if [ -z "$RXVT_SOCKET" ]; then
+  RXVT_SOCKET="$XDG_RUNTIME_DIR/urxvt/urxvt-$HOSTNAME"
+fi
+if [ -z "$XAUTHORITY" ]; then
+  XAUTHORITY="${XDG_RUNTIME_DIR}/xauthority"
+fi
+
+export HOSTNAME ICEAUTHORITY TMUX_TMPDIR RXVT_SOCKET XAUTHORITY
 
 __mkdir_if_set() {
   __dir="$1"
@@ -25,27 +68,41 @@ __mkdir_if_set() {
   fi
 
   mkdir -p "$__dir"
-  unset __dir
+  unset -v __dir
+}
+
+__mkdir_dirname_if_set() {
+  __dirpath="$1"
+
+  if [ ! -z "$__dirpath" ]; then
+    __mkdir_if_set "$(dirname "$__dirpath")"
+  fi
+  unset -v __dirpath
 }
 
 # Create important directories if missing
 __mkdir_if_set "$LOCAL_BIN"
 __mkdir_if_set "$XDG_CONFIG_HOME"
 __mkdir_if_set "$XDG_CACHE_HOME"
-__mkdir_if_set "$(dirname "$LESSHISTFILE")"
-
-unset -f __mkdir_if_set
+__mkdir_if_set "$XDG_DATA_HOME"
+__mkdir_if_set "$XDG_RUNTIME_DIR"
+__mkdir_if_set "$TMUX_TMPDIR"
+__mkdir_dirname_if_set "$RXVT_SOCKET"
+__mkdir_dirname_if_set "$LESSHISTFILE"
+unset -f __mkdir_if_set __mkdir_dirname_if_set
 
 # Source dircolors
 if command -v dircolors > /dev/null 2>&1; then
-  __dir_colors="$(dircolors "$XDG_CONFIG_HOME"/dircolors)"
+  __dir_colors_path="$XDG_CONFIG_HOME/dircolors"
+  mkdir -p "$__dir_colors_path"
+  __dir_colors="$(dircolors "$__dir_colors_path")"
 
   if [ -f "$__dir_colors" ] && \
         [ -r "$__dir_colors" ]; then
     . "$__dir_colors"
   fi
 
-  unset -v __dir_colors
+  unset -v __dir_colors_path __dir_colors
 fi
 
 # Aliases

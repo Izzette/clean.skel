@@ -7,4 +7,4 @@ PS2='%_> '
 PS3='?: '
 PS4='+%N:%i> '
 
-# vim: set tgTs=2 sw=2 et syn=zsh:
+# vim: set ts=2 sw=2 et syn=zsh:

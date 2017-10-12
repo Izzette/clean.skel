@@ -8,10 +8,6 @@ fi
 # Source shell
 source "$HOME/.profile"
 
-if [[ ! -z "$LOCAL_BIN" && *"$LOCAL_BIN"* != "$PATH" ]]; then
-  PATH="$LOCAL_BIN${PATH:+:$PATH}"
-fi
-
 __bash_prompt="$XDG_CONFIG_HOME/bash.bash_prompt"
 
 if [[ -f "$__bash_prompt" && \
